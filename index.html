@@ -5,21 +5,55 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Bookmarks</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
-  <script src="main.js"></script>
+  <link rel="stylesheet" type="text/css" media="screen" href="index.css" />
 </head>
 <body>
   <main>
-    <div>
+    <div class="container">
+      <div class="controls">
+        <button id="add-bookmark-button" class="button">Add New Bookmark</button>
+        <button id="select-rating-filter" class="button">Dropdown</button>
+      </div>
       <ul class="bookmarks">
-        <li class="bookmark">Here's a bookmark!</li>
+        <li class="bookmark">
+          <div class="condensed">
+            <h3>Website title</h3>
+            <h4 class="star-rating">star rating</h4>
+          </div>
+        </li>
+        <li class="bookmark">
+          <div class="verbose">
+            <h3>Website title</h3>
+            <h4 class="star-rating">star rating</h4>
+            <h4><a class="url" href="/index.html">website</a></h4>
+            <p>descriptive text lorem ipsum</p>
+            <button>add</button>
+            <button>delete</button>
+            <button>edit</button>
+          </div>
+        </li>
+        <li class="bookmark">
+          <div class="edit-add-form">
+            <form action="">
+              <input type="text" name="fname" value="Website title"><br>
+              <input type="text" name="url" value="URL"><br>
+              <h5>Rating</h5>
+              <input type="radio" name="stars">*<br>
+              <input type="radio" name="stars">**<br>
+              <input type="radio" name="stars">***<br>
+              <input type="radio" name="stars">****<br>
+              <input type="radio" name="stars">*****<br>
+              <input type="submit" value="Save">
+            </form>
+          </div>
+        </li>
       </ul>
     <div>
   </main>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/cuid/1.3.8/browser-cuid.min.js"></script>
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-  <script type="text/javascript" src="scripts/shopping-list.js"></script>
-  <script type="text/javascript" src="scripts/Items.js"></script>
+  <script type="text/javascript" src="scripts/bookmarks.js"></script>
+  <script type="text/javascript" src="scripts/api.js"></script>
   <script type="text/javascript" src="scripts/store.js"></script>
   <script type="text/javascript" src="scripts/index.js"></script>
 </body>
