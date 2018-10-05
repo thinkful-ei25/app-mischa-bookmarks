@@ -14,15 +14,19 @@ h1{
 }
 .container{
   margin: auto;
-  width: 50%;
+  width: 40%;
 }
 
-.controls *{
+.controls{
   border: 2px solid black;
-  height: auto;
-  padding: 30px;
+  padding: 10px;
+  margin: 10px;
 }
-.
+
+.form-title{
+  margin-bottom:2px;
+}
+
 ul {
   list-style-type: none;
   padding: 0;
@@ -34,25 +38,33 @@ ul.bookmarks{
 .filter{
   display: inline-block;
 }
-.controls{
+
+.bookmark{
   border: 2px solid black;
-  padding: 5px;
+  padding: 10px;
   margin: 10px;
 }
-.bookmark{
-  /* width: 50px; */
-  height: auto;
-  /* text-align: center; */
-  border: 1px solid black;
-  margin: 5px;
-  border-radius: 5%;
-  padding: 10px;
+.condensed > h3{
+  display: inline;
+}
+.verbose > h3{
+  display: inline;
 }
 .verbose{
-  height: 290px;
+  height: auto;
+}
+.desc-section{
+  border: .5px dotted grey;
+  margin: 5px;
+}
+.desc{
+  margin: 5px;
+}
+.desc-title{
+  margin: 5px;
 }
 
-.star-rating{
+.stars-rating{
   float: right;
-  text-align: right;
+  /* vertical-align: middle; */
 }

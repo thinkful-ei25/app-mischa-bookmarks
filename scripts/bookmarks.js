@@ -17,17 +17,24 @@ const bookmarks = (function(){
   
   //generates controls html -- either add / filter OR form
   
+  function starsFromRating(rating){
+    let stars = '';
+    for(let i = 0; i < rating; i++){
+      stars += '*';
+    }
+    return stars;
+  }
   function generateVerboseHtml(item){
     return `
       <li data-bookmark-id=${item.id} class="bookmark">
         <div class="verbose">
           <h3>${item.title}</h3>
-          <div class="star-rating">
-            <h4>star rating</h4>
-            <h5>${item.rating}</h5>
-          <div>
-          <h4><a class="url" href="${item.url}">website</a></h4>
-          <p>${item.desc}</p>
+            <span class="stars-rating">${starsFromRating(item.rating)}</span>
+          <h4><a class="url" href="${item.url}">Visit Site</a></h4>
+          <section class="desc-section">
+            <h4 class="desc-title"> Description of this site: </h4> 
+            <p class="desc">${item.desc}</p>
+          </section>
           <button class="js-delete-button">delete</button>
           <button>edit</button>
         </div>
@@ -39,39 +46,57 @@ const bookmarks = (function(){
       <li data-bookmark-id=${item.id} class="bookmark">
         <div class="condensed">
           <h3>${item.title}</h3>
-          <div class="js-star-rating">
-              <h4>${item.rating}</h4>
-          </div>
+          <span class="stars-rating">${starsFromRating(item.rating)}</span>
         </div>
       </li>
     `;
   }
-  function generateFormHtml(item = null){
+  function generateNewItemFormHtml(){
     return `
-    ${item ? '<li data-item-id class="bookmark">' : ''}
-      <div class="edit-add-form">
-        <form ${!item ? 'id="js-add-item-form" name="js-add-item-form"':''} class = ${!item ? 'js-new-item-form' : 'js-edit-item-form'} action="">
-        ${!item ? 'Website name' : ''}<input class="js-name-data" type="text" ${!item ? 'name="title"':''} value="${item ? item.name : 'input'}"><br>
-        ${!item ? 'Website url' : ''} <input class="js-url-data" type="text" ${!item ? 'name="url"':''} value="${item ? item.url : 'input'}"><br>
-        ${!item ? 'Website description' : ''}  <input class="js-description-data" type="text" ${!item ? 'name="desc"':''} value="${item ? item.description : 'input'}"><br>
-          <h5>Rating</h5>
-
+      <div class="new-bookmark">
+        <form id="js-add-item-form new-item-form" name="js-add-item-form" action="">
+          <label for="name-data" class="input-title form-title"> Website title </label>
+          <input class="name-data" type="text" name="title" placeholder="eg. Google"><br>
+          <label for="url-data" class="input-url form-title"> Website Url </label>
+          <input class="url-data" type="text" name="url" placeholder="eg. http://www.google.com"><br>
+          <label for="desc-data" class="input-desc form-title"> Website Description </label>
+          <input class="desc-data" type="text" name="desc" placeholder="eg. the best search engine out there" ><br>
+          <label for="rating-data" class="input-rating form-title"> Rating </label>
+          ${generateFilterRadioButtons()}
+          <input type="submit" value="Submit">
+        </form>
       </div>
-    ${item ? '</li>' : ''}
-  
+      `;
+  }
+  function generateEditItemFormHtml(item){
+    return `
+    <li data-item-id=${item.id} class="bookmark"> 
+      <div class="edit-form">
+        <form class = 'js-edit-item-form edit-item-form' action="">
+          <label for="name-data"></label>
+          <input class="name-data" type="text" default-value="${item.name}"><br>
+          <label for="url-data"></label>
+          <input class="js-url-data" type="text" 'name="url" value="${item.url}"><br>
+          <label for="desc-data"></label>
+          <input class="js-description-data" type="text" name="desc"' default-value="${item.description}"><br>
+          ${generateFilterRadioButtons(item.rating)}
+          <input type="submit" value="Edit">
+      </div>
+    </li>
     `;
-
   }
   function generateControlsHtml(){
     if(store.addingNewItemToggle) {
-      return generateFormHtml();
+      return generateNewItemFormHtml();
     }else{
       return `
-        <button id="js-add-bookmark-button" class="add-new-item-button button">Add New Bookmark</button>
-        <label for="stars">Filter by star rating: </label>
-        <form class="js-filter-by-rating filter">
-          ${generateFilterRadioButtons()}
-        </form>
+        <div class="default-control-bar">
+          <button id="js-add-bookmark-button" class="add-new-item-button button">Add New Bookmark</button><br>
+          <label for="stars">Filter by star rating: </label>
+          <form class="js-filter-by-rating filter">
+            ${generateFilterRadioButtons()}
+          </form>
+        </div>
       `;
     }
   }
@@ -80,7 +105,7 @@ const bookmarks = (function(){
     let radioButtonHtml = '';
     const filterRating = store.filterByRating;
     for(let i = 0; i < 5; i ++){
-      radioButtonHtml += `<input class="filter-radio-btns" type="radio" name="stars" value="${i+1}"`;
+      radioButtonHtml += `<input class="filter-radio-btns" type="radio" name="rating" value="${i+1}"`;
       (filterRating === i+1) ? radioButtonHtml += ` checked>${stars}` : radioButtonHtml += `>${stars}`;
       stars += '*';
     }
@@ -91,16 +116,34 @@ const bookmarks = (function(){
       if (item.condensed){
         return generateCondensedHtml(item);
       }else if(item.editing){
-        return generateFormHtml(item);
+        return generateEditItemFormHtml(item);
       }else {
         return generateVerboseHtml(item);
       }
     });
     return items.join('');
   }
+  function generateError(err) {
+    let message = '';
+    if (err.responseJSON && err.responseJSON.message) {
+      message = err.responseJSON.message;
+    } else {
+      message = `${err.code} Server Error`;
+    }
+
+    return `
+      <section class="error-content">
+        <p>${message}</p>
+      </section>
+    `;
+  }
   function render(){
-    if (store.errorMessage){
-      $('.js-error-message').html(store.errorMessage);
+    $('.js-error-message').empty();
+    if (store.errorMessage) {
+      console.log(store.errorMessage);
+      const errorHtml = generateError(store.errorMessage);
+      $('.js-error-message').html(errorHtml);
+      console.log('test');
       store.errorMessage = null;
     }
     let items = store.items.filter(item => item.rating >= store.filterByRating);
@@ -118,6 +161,7 @@ const bookmarks = (function(){
     $('.js-controls').on('submit', '#js-add-item-form', event => {
       event.preventDefault();
       const newJsonItem = $(event.target).serializeJson();
+      console.log(newJsonItem);
       api.createItem(newJsonItem, 
         (newItem) => {
           store.addItem(newItem);
@@ -125,8 +169,7 @@ const bookmarks = (function(){
           render();
         },
         (err) => {
-          const errMessage = JSON.parse(err.responseText).message; 
-          store.errorMessage = errMessage;
+          store.errorMessage = err;
           render();
         }
       );
@@ -139,7 +182,6 @@ const bookmarks = (function(){
       render();
     });
   }
-
   function handleDeleteItem(){
     $('ul').on('click', '.js-delete-button', event => {
       console.log(event.target);
@@ -153,10 +195,9 @@ const bookmarks = (function(){
         });
     });
   }
-
   function handleFilterByRating(){
     $('.container').on('click', '.js-filter-by-rating', () =>{
-      const filter = $('input[name=\'stars\']:checked').val();
+      const filter = $('input[name=\'rating\']:checked').val();
       store.filterByRating = parseInt(filter, 10);
       render();
     });
