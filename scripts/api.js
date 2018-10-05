@@ -9,15 +9,21 @@ const api = (function(){
   };
 
   const createItem = function(item, onSuccess) {
-    const newItem = JSON.stringify(item);
-    console.log(newItem);
     $.ajax({
       url: BASE_URL + '/bookmarks',
       method: 'POST',
       contentType: 'application/json',
-      data: newItem,
+      data: item,
       success: onSuccess,
       // error: onError,
+    });
+  };
+
+  const deleteItem = function(id, callback) {
+    $.ajax({
+      url: BASE_URL + '/bookmarks/' + id,
+      method: 'DELETE',
+      success: callback
     });
   };
 
@@ -31,18 +37,12 @@ const api = (function(){
   //   });
   // };
 
-  // const deleteItem = function(id, callback) {
-  //   $.ajax({
-  //     url: BASE_URL + '/items/' + id,
-  //     method: 'DELETE',
-  //     success: callback
-  //   });
-  // };
+ 
 
   return {
     getItems,
     createItem,
     // updateItem,
-    // deleteItem,
+    deleteItem,
   };
 }());

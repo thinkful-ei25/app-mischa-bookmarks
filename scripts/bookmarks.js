@@ -2,11 +2,24 @@
 'use strict';
 // eslint-disable-next-line no-unused-vars
 const bookmarks = (function(){
+  $.fn.extend({
+    serializeJson: function serializeJson(){
+      if (!this.is('form')) throw new TypeError('Not a form');
+
+      const formData = new FormData(this[0]);
+
+      const jsonObj = {};
+      formData.forEach((val, name) => jsonObj[name] = val);
+
+      return JSON.stringify(jsonObj);
+    }
+  });
+  
   //generates controls html -- either add / filter OR form
   
   function generateVerboseHtml(item){
     return `
-      <li class="bookmark">
+      <li data-bookmark-id=${item.id} class="bookmark">
         <div class="verbose">
           <h3>${item.title}</h3>
           <div class="star-rating">
@@ -15,8 +28,7 @@ const bookmarks = (function(){
           <div>
           <h4><a class="url" href="${item.url}">website</a></h4>
           <p>${item.desc}</p>
-          <button>add</button>
-          <button>delete</button>
+          <button class="js-delete-button">delete</button>
           <button>edit</button>
         </div>
       </li>
@@ -24,7 +36,7 @@ const bookmarks = (function(){
   }
   function generateCondensedHtml(item){
     return `
-      <li class="bookmark">
+      <li data-bookmark-id=${item.id} class="bookmark">
         <div class="condensed">
           <h3>${item.title}</h3>
           <div class="js-star-rating">
@@ -36,19 +48,19 @@ const bookmarks = (function(){
   }
   function generateFormHtml(item = null){
     return `
-    ${item ? '<li class="bookmark">' : ''}
+    ${item ? '<li data-item-id class="bookmark">' : ''}
       <div class="edit-add-form">
         <form ${!item ? 'id="js-add-item-form" name="js-add-item-form"':''} class = ${!item ? 'js-new-item-form' : 'js-edit-item-form'} action="">
-        ${!item ? 'Website name' : ''}<input class="js-name-data" type="text" ${!item ? 'name="name"':''} value="${item ? item.name : 'input'}"><br>
+        ${!item ? 'Website name' : ''}<input class="js-name-data" type="text" ${!item ? 'name="title"':''} value="${item ? item.name : 'input'}"><br>
         ${!item ? 'Website url' : ''} <input class="js-url-data" type="text" ${!item ? 'name="url"':''} value="${item ? item.url : 'input'}"><br>
-        ${!item ? 'Website description' : ''}  <input class="js-description-data" type="text" ${!item ? 'name="description"':''} value="${item ? item.description : 'input'}"><br>
+        ${!item ? 'Website description' : ''}  <input class="js-description-data" type="text" ${!item ? 'name="desc"':''} value="${item ? item.description : 'input'}"><br>
           <h5>Rating</h5>
-          <input type="radio" name="stars" value="1">*<br>
-          <input type="radio" name="stars" value="2">**<br>
-          <input type="radio" name="stars" value="3">***<br>
-          <input type="radio" name="stars" value="4">****<br>
-          <input type="radio" name="stars" value="5">*****<br>
-          <input type="submit" value=${item ? 'save' : 'submit'}>
+          <label><input type="radio" name="rating" value="1">*<br></label>
+          <label><input type="radio" name="rating" value="2">**<br></label>
+          <label><input type="radio" name="rating" value="3">***<br></label>
+          <label><input type="radio" name="rating" value="4">****<br></label>
+          <label><input type="radio" name="rating" value="5">*****<br></label>
+          <label> <input type="submit" value=${item ? 'save' : 'submit'}></label>
         </form>
       </div>
     ${item ? '</li>' : ''}
@@ -56,27 +68,33 @@ const bookmarks = (function(){
     `;
 
   }
-
   function generateControlsHtml(){
-    if(store.addingNewItem) {
+    if(store.addingNewItemToggle) {
       return generateFormHtml();
     }else{
       return `
         <button id="js-add-bookmark-button" class="button">Add New Bookmark</button>
         <button id="select-rating-filter" class="button">Dropdown</button>
-        <input type="radio" name="stars" value="1">*<br>
-        <input type="radio" name="stars" value="2">**<br>
-        <input type="radio" name="stars" value="3">***<br>
-        <input type="radio" name="stars" value="4">****<br>
-        <input type="radio" name="stars" value="5">*****<br>
+        <form class="js-filter-by-rating">
+          ${generateFilterRadioButtons()}
+        </form>
       `;
     }
   }
-
+  function generateFilterRadioButtons(){
+    let stars = '*';
+    let radioButtonHtml = '';
+    const filterRating = store.filterByRating;
+    for(let i = 0; i < 5; i ++){
+      radioButtonHtml += `<input type="radio" name="stars" value="${i+1}"`;
+      (filterRating === i+1) ? radioButtonHtml += ` checked>${stars}` : radioButtonHtml += `>${stars}`;
+      stars += '*';
+    }
+    return radioButtonHtml;
+  }
   function generatBookmarksItemsString(bookmarks) {
     const items = bookmarks.map((item) => {
-      console.log(item.condensed);
-      if (item.condensed !== true){
+      if (item.condensed){
         return generateCondensedHtml(item);
       }else if(item.editing){
         return generateFormHtml(item);
@@ -86,45 +104,71 @@ const bookmarks = (function(){
     });
     return items.join('');
   }
-  // -->> how to set items to condensed on load but not on render??
   function render(){
-    console.log('render called!');
-    let items = store.items;
+    let items = store.items.filter(item => item.rating >= store.filterByRating);
     const bookmarksHtmlString = generatBookmarksItemsString(items);
-    $('.js-controls').html(generateControlsHtml);
+    $('.js-controls').html(generateControlsHtml());
     $('.js-bookmarks').html(bookmarksHtmlString);
   }
-
   function handleAddItemButton(){
     $('.js-controls').on('click', '#js-add-bookmark-button', function(){
-      store.addingNewItem = true;
+      store.addingNewItemToggle = true;
       render();
     });
   }
-
   function handleSubmitNewItem(){
     $('.js-controls').on('submit', '#js-add-item-form', event => {
       event.preventDefault();
-      const newItem = {
-        title :  $('.js-name-data').val(),
-        url :  $('.js-url-data').val(),
-        desc : $('.js-description-data').val(),
-        rating : $('input[name="stars"]:checked').val()
-      };
-      api.createItem(newItem, 
+      const newJsonItem = $(event.target).serializeJson();
+      api.createItem(newJsonItem, 
         (newItem) => {
-          newItem.condensed = true;
           store.addItem(newItem);
+          store.addingNewItemToggle = false;
           render();
         });
     });
   }
-  function getFilterByRating(){
-
+  function handleCondensedModeToggle(){
+    $('ul').on('click', '.bookmark', event => {
+      const itemId = getIDFromElement(event.currentTarget);
+      store.toggleCondensedMode(itemId);
+      render();
+    });
   }
+
+  function handleDeleteItem(){
+    $('ul').on('click', '.js-delete-button', event => {
+      console.log(event.target);
+      const item = event.target.closest('.bookmark');
+      const id = getIDFromElement(item);
+      console.log(id);
+      api.deleteItem(id, 
+        () => {
+          store.deleteItem(id);
+          render();
+        });
+    });
+  }
+
+  function handleFilterByRating(){
+    $('.container').on('click', '.js-filter-by-rating', () =>{
+      const filter = $('input[name=\'stars\']:checked').val();
+      store.filterByRating = parseInt(filter, 10);
+      render();
+    });
+  }
+  function getIDFromElement(element){
+    return $(element)
+      .closest('.bookmark')
+      .data('bookmark-id');
+  }
+
   function bindEventListeners(){
     handleAddItemButton();
     handleSubmitNewItem();
+    handleCondensedModeToggle();
+    handleDeleteItem();
+    handleFilterByRating();
   }
 
   return {

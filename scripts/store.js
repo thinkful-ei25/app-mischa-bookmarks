@@ -5,18 +5,24 @@ const store = (function(){
   // function getItem(){
 
   // }
+  let addingNewItemToggle = false;
+
   const addItem = function(item){
+    item.condensed = true;
     this.items.push(item);
+    addingNewItemToggle = false;
   };
- 
-  const addingNewItemToggle = false;
 
-  const filterByRating = 1;
-  // const filterByRating = function(minRating){
-  //   this.filter = minRating;
-  // };
+  function toggleCondensedMode(id){
+    const item = this.items.find(item => item.id === id);
+    item.condensed = !item.condensed;
+  }
 
-
+  function deleteItem(id){
+    this.items = this.items.filter(item => item.id !== id);
+  }
+  
+  let filterByRating = 1;
 
 
 
@@ -25,6 +31,8 @@ const store = (function(){
     items : [],
     addingNewItemToggle,
     addItem,
-    filterByRating
+    toggleCondensedMode,
+    filterByRating,
+    deleteItem
   };
 }());
