@@ -55,13 +55,7 @@ const bookmarks = (function(){
         ${!item ? 'Website url' : ''} <input class="js-url-data" type="text" ${!item ? 'name="url"':''} value="${item ? item.url : 'input'}"><br>
         ${!item ? 'Website description' : ''}  <input class="js-description-data" type="text" ${!item ? 'name="desc"':''} value="${item ? item.description : 'input'}"><br>
           <h5>Rating</h5>
-          <label><input type="radio" name="rating" value="1">*<br></label>
-          <label><input type="radio" name="rating" value="2">**<br></label>
-          <label><input type="radio" name="rating" value="3">***<br></label>
-          <label><input type="radio" name="rating" value="4">****<br></label>
-          <label><input type="radio" name="rating" value="5">*****<br></label>
-          <label> <input type="submit" value=${item ? 'save' : 'submit'}></label>
-        </form>
+
       </div>
     ${item ? '</li>' : ''}
   
