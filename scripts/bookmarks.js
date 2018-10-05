@@ -73,9 +73,9 @@ const bookmarks = (function(){
       return generateFormHtml();
     }else{
       return `
-        <button id="js-add-bookmark-button" class="button">Add New Bookmark</button>
-        <button id="select-rating-filter" class="button">Dropdown</button>
-        <form class="js-filter-by-rating">
+        <button id="js-add-bookmark-button" class="add-new-item-button button">Add New Bookmark</button>
+        <label for="stars">Filter by star rating: </label>
+        <form class="js-filter-by-rating filter">
           ${generateFilterRadioButtons()}
         </form>
       `;
@@ -86,7 +86,7 @@ const bookmarks = (function(){
     let radioButtonHtml = '';
     const filterRating = store.filterByRating;
     for(let i = 0; i < 5; i ++){
-      radioButtonHtml += `<input type="radio" name="stars" value="${i+1}"`;
+      radioButtonHtml += `<input class="filter-radio-btns" type="radio" name="stars" value="${i+1}"`;
       (filterRating === i+1) ? radioButtonHtml += ` checked>${stars}` : radioButtonHtml += `>${stars}`;
       stars += '*';
     }
@@ -105,6 +105,10 @@ const bookmarks = (function(){
     return items.join('');
   }
   function render(){
+    if (store.errorMessage){
+      $('.js-error-message').html(store.errorMessage);
+      store.errorMessage = null;
+    }
     let items = store.items.filter(item => item.rating >= store.filterByRating);
     const bookmarksHtmlString = generatBookmarksItemsString(items);
     $('.js-controls').html(generateControlsHtml());
@@ -125,7 +129,13 @@ const bookmarks = (function(){
           store.addItem(newItem);
           store.addingNewItemToggle = false;
           render();
-        });
+        },
+        (err) => {
+          const errMessage = JSON.parse(err.responseText).message; 
+          store.errorMessage = errMessage;
+          render();
+        }
+      );
     });
   }
   function handleCondensedModeToggle(){

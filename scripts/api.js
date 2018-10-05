@@ -8,14 +8,14 @@ const api = (function(){
     $.getJSON(BASE_URL + '/bookmarks', callback);
   };
 
-  const createItem = function(item, onSuccess) {
+  const createItem = function(item, onSuccess, onError) {
     $.ajax({
       url: BASE_URL + '/bookmarks',
       method: 'POST',
       contentType: 'application/json',
       data: item,
       success: onSuccess,
-      // error: onError,
+      error: onError,
     });
   };
 
@@ -27,22 +27,9 @@ const api = (function(){
     });
   };
 
-  // const updateItem = function(id, updateData, callback) {
-  //   $.ajax({
-  //     url: BASE_URL + '/items/' + id,
-  //     method: 'PATCH',
-  //     contentType: 'application/json',
-  //     data: JSON.stringify(updateData),
-  //     success: callback
-  //   });
-  // };
-
- 
-
   return {
     getItems,
     createItem,
-    // updateItem,
     deleteItem,
   };
 }());

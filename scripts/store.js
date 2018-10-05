@@ -24,6 +24,7 @@ const store = (function(){
   
   let filterByRating = 1;
 
+  let errorMessage = null;
 
 
 
@@ -33,6 +34,7 @@ const store = (function(){
     addItem,
     toggleCondensedMode,
     filterByRating,
-    deleteItem
+    deleteItem,
+    errorMessage
   };
 }());
