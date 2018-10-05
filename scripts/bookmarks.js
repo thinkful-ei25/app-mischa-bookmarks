@@ -36,7 +36,6 @@ const bookmarks = (function(){
             <p class="desc">${item.desc}</p>
           </section>
           <button class="js-delete-button">delete</button>
-          <button>edit</button>
         </div>
       </li>
     `;
@@ -99,8 +98,6 @@ const bookmarks = (function(){
     const items = bookmarks.map((item) => {
       if (item.condensed){
         return generateCondensedHtml(item);
-      }else if(item.editing){
-        return generateEditItemFormHtml(item);
       }else {
         return generateVerboseHtml(item);
       }
