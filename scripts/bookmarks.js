@@ -35,7 +35,6 @@ const bookmarks = (function(){
     `;
   }
   function generateFormHtml(item = null){
-    console.log(item);
     return `
     ${item ? '<li class="bookmark">' : ''}
       <div class="edit-add-form">
@@ -76,8 +75,8 @@ const bookmarks = (function(){
 
   function generatBookmarksItemsString(bookmarks) {
     const items = bookmarks.map((item) => {
-      // console.log(item);
-      if (item.condensed){
+      console.log(item.condensed);
+      if (item.condensed !== true){
         return generateCondensedHtml(item);
       }else if(item.editing){
         return generateFormHtml(item);
@@ -87,13 +86,10 @@ const bookmarks = (function(){
     });
     return items.join('');
   }
-
+  // -->> how to set items to condensed on load but not on render??
   function render(){
-    // const filter = getFilterByRating();
-    const items = store.items.map((item) => {
-      item.condensed = true;
-      return item;
-    });
+    console.log('render called!');
+    let items = store.items;
     const bookmarksHtmlString = generatBookmarksItemsString(items);
     $('.js-controls').html(generateControlsHtml);
     $('.js-bookmarks').html(bookmarksHtmlString);
@@ -103,7 +99,6 @@ const bookmarks = (function(){
     $('.js-controls').on('click', '#js-add-bookmark-button', function(){
       store.addingNewItem = true;
       render();
-
     });
   }
 
@@ -118,6 +113,7 @@ const bookmarks = (function(){
       };
       api.createItem(newItem, 
         (newItem) => {
+          newItem.condensed = true;
           store.addItem(newItem);
           render();
         });

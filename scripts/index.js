@@ -1,7 +1,6 @@
 /* global bookmarks, store $ api*/
 'use strict';
 $(document).ready(function() {
-  // shoppingList.bindEventListeners();
   bookmarks.bindEventListeners();
   bookmarks.render();
 
