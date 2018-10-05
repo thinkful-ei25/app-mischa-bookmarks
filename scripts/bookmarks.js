@@ -68,23 +68,7 @@ const bookmarks = (function(){
       </div>
       `;
   }
-  function generateEditItemFormHtml(item){
-    return `
-    <li data-item-id=${item.id} class="bookmark"> 
-      <div class="edit-form">
-        <form class = 'js-edit-item-form edit-item-form' action="">
-          <label for="name-data"></label>
-          <input class="name-data" type="text" default-value="${item.name}"><br>
-          <label for="url-data"></label>
-          <input class="js-url-data" type="text" 'name="url" value="${item.url}"><br>
-          <label for="desc-data"></label>
-          <input class="js-description-data" type="text" name="desc"' default-value="${item.description}"><br>
-          ${generateFilterRadioButtons(item.rating)}
-          <input type="submit" value="Edit">
-      </div>
-    </li>
-    `;
-  }
+
   function generateControlsHtml(){
     if(store.addingNewItemToggle) {
       return generateNewItemFormHtml();
