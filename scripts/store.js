@@ -1,15 +1,20 @@
-/* global */
+/* global cuid*/
 'use strict';
 // eslint-disable-next-line no-unused-vars
 const store = (function(){
+  // function getItem(){
 
-  const toggleAdding = function() {
-    this.addingAnItem = !this.addingAnItem;
+  // }
+  const addItem = function(item){
+    this.items.push(item);
   };
+ 
+  const addingNewItemToggle = false;
 
-  const filterByRating = function(minRating){
-    this.filter = minRating;
-  };
+  const filterByRating = 1;
+  // const filterByRating = function(minRating){
+  //   this.filter = minRating;
+  // };
 
 
 
@@ -17,8 +22,9 @@ const store = (function(){
 
 
   return{
-    items: [],
-    toggleAdding,
+    items : [],
+    addingNewItemToggle,
+    addItem,
     filterByRating
   };
 }());

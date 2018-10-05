@@ -7,23 +7,27 @@ body * {
 }
 .controls{
   border: 2px solid black;
-  height: 100px;
+  height: auto;
 }
 ul {
   list-style-type: none;
   padding: 0;
+  height: auto;
 }
-.bookmarks{
+ul.bookmarks{
+  border: 2px solid black;
 }
 .bookmark{
   /* width: 50px; */
   height: auto;
   /* text-align: center; */
   border: 1px solid black;
+  margin: 5px;
+  border-radius: 5%;
+  padding: 10px;
 }
-
-h3{
-  display: inline-block;
+.verbose{
+  height: 290px;
 }
 
 .star-rating{
