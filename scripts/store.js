@@ -1,10 +1,8 @@
-/* global cuid*/
+/* global */
 'use strict';
 // eslint-disable-next-line no-unused-vars
 const store = (function(){
-  // function getItem(){
 
-  // }
   let addingNewItemToggle = false;
 
   const addItem = function(item){

@@ -53,7 +53,7 @@ const bookmarks = (function(){
   function generateNewItemFormHtml(){
     return `
       <div class="new-bookmark">
-        <form id="js-add-item-form new-item-form" name="js-add-item-form" action="">
+        <form id="js-add-item-form" name="js-add-item-form" action="">
           <label for="name-data" class="input-title form-title"> Website title </label>
           <input class="name-data" type="text" name="title" placeholder="eg. Google"><br>
           <label for="url-data" class="input-url form-title"> Website Url </label>
@@ -119,7 +119,7 @@ const bookmarks = (function(){
     `;
   }
   function render(){
-    $('.js-error-message').empty();
+    console.log(store.items);
     if (store.errorMessage) {
       console.log(store.errorMessage);
       const errorHtml = generateError(store.errorMessage);
@@ -128,6 +128,7 @@ const bookmarks = (function(){
       store.errorMessage = null;
     }
     let items = store.items.filter(item => item.rating >= store.filterByRating);
+    console.log(items);
     const bookmarksHtmlString = generatBookmarksItemsString(items);
     $('.js-controls').html(generateControlsHtml());
     $('.js-bookmarks').html(bookmarksHtmlString);
@@ -142,6 +143,7 @@ const bookmarks = (function(){
     $('.js-controls').on('submit', '#js-add-item-form', event => {
       event.preventDefault();
       const newJsonItem = $(event.target).serializeJson();
+      console.log(newJsonItem);
       console.log(newJsonItem);
       api.createItem(newJsonItem, 
         (newItem) => {
